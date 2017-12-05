@@ -15,7 +15,7 @@ EOS_CHAR, EOS_INDEX = '<EOS>', 0
 UNK_CHAR, UNK_INDEX = '<UNK>', 1
 SOS_CHAR, SOS_INDEX = '<SOS>', 2
 flags.DEFINE_integer('batch_size', 10, '')
-flags.DEFINE_integer('hidden_dim', 512, '')
+flags.DEFINE_integer('hidden_dim', 256, '')
 flags.DEFINE_integer('num_units', 3, '')
 flags.DEFINE_integer('embed_dim', 100, '')
 flags.DEFINE_integer('learning_rate', 0.001, '')
@@ -29,7 +29,7 @@ FLAGS = flags.FLAGS
 data_root_dir = './workspace'
 paras_file = FLAGS.paras_file
 titles_file = FLAGS.titles_file
-# embedding_file = 'glove.6B.100d.txt'
+# embedding_file = 'glove.6B.100d.txt
 embedding_file = FLAGS.embedding_file
 ckpt_dir = './checkpoints'
 
@@ -77,7 +77,10 @@ def get_bleu(sess, batch_size):
 
 
 def rev_vocab(vocab):
-  return {idx: key for key, idx in vocab.iteritems()}
+  rev_vocab = dict()
+  for index, val in enumerate(vocab):
+    rev_vocab[index] = val
+  return rev_vocab
 
 vocab, embedding = loadGlove(embedding_file)
 embedding_W = tf.Variable(tf.constant(0.0, shape=embedding.shape), trainable=False, name='embedding_w')
@@ -103,7 +106,7 @@ def _input_parse_function(para, title):
 paras_ph = tf.placeholder(tf.string, shape=(None,))
 titles_ph = tf.placeholder(tf.string, shape=(None,))
 # is_training = tf.placeholder(tf.bool, shape=())
-is_training = True
+is_training = False
 batch_size = tf.placeholder(tf.int32, shape=())
 # paras_ph = input_paras
 # titles_ph = input_titles
@@ -159,16 +162,6 @@ outputs, final_state, final_sequence_lengths = tf.contrib.seq2seq.dynamic_decode
 # TODO: Add variable for maximum iterations
 blue_score = bleu.bleu_score(predictions=outputs.sample_id, labels=title_batch[:, 1:])
 
-##################
-## Optimisation ##
-##################
-weights = tf.cast(tf.sequence_mask(title_length), tf.float32)
-loss = tf.reduce_sum(tf.contrib.seq2seq.sequence_loss(logits=outputs.rnn_output, targets=title_batch[:, 1:],
-                                                      weights=weights, average_across_timesteps=False))
-loss_summary = tf.summary.scalar('training_loss', loss)
-global_step = tf.Variable(0, trainable=False, name='global_step')
-optimizer = tf.train.AdamOptimizer(FLAGS.learning_rate).minimize(loss, global_step=global_step)
-
 ##############
 ## Training ##
 ##############
@@ -177,42 +170,30 @@ sess = tf.Session()
 tf.tables_initializer().run(session=sess)
 sess.run(tf.global_variables_initializer())
 sess.run(embedding_init, feed_dict={embedding_placeholder: embedding})
-train_writer = tf.summary.FileWriter(ckpt_dir, sess.graph)
-saver = tf.train.Saver()
-train_bleu = tf.Variable(0.0, name='Train_bleu')
-train_bleu_summary = tf.summary.scalar('Training Bleu', train_bleu)
-val_bleu = tf.Variable(0.0, name='Validation_bleu')
-val_bleu_summary = tf.summary.scalar('Validation Bleu', val_bleu)
+saver = tf.train.import_meta_graph('checkpoints.meta')
+saver.restore(sess, tf.train.latest_checkpoint('./'))
 
-for epoch in range(FLAGS.epochs):
-  print("Training for epoch: {}".format(epoch))
-  sess.run(iterator.initializer, feed_dict={paras_ph: input_paras,
-                                            titles_ph: input_titles,
-                                            batch_size: FLAGS.batch_size})
-  while True:
-    try:
-      _, tb_summary = sess.run([optimizer, loss_summary], feed_dict={batch_size: FLAGS.batch_size})
-      train_writer.add_summary(tb_summary, global_step=global_step.eval(session=sess))
-    except tf.errors.OutOfRangeError:
-      break
-  if epoch % 10 == 0:
-    saver.save(sess, ckpt_dir)
-    sess.run(iterator.initializer, feed_dict={paras_ph: input_paras,
-                                              titles_ph: input_titles,
-                                              batch_size: 1})
-    train_bleu_temp = get_bleu(sess, batch_size)
-    sess.run(train_bleu.assign(train_bleu_temp))
-    train_bleu_summ = sess.run(train_bleu_summary)
-    train_writer.add_summary(train_bleu_summ, global_step=epoch)
-    print('Training bleu {}'.format(train_bleu_temp))
-    sess.run(iterator.initializer, feed_dict={paras_ph: val_paras,
-                                              titles_ph: val_titles,
-                                              batch_size: 1})
-    val_bleu_temp = get_bleu(sess, batch_size)
-    sess.run(val_bleu.assign(val_bleu_temp))
-    val_bleu_summ = sess.run(val_bleu_summary)
-    train_writer.add_summary(val_bleu_summ, global_step=epoch)
-    print('Validation bleu {}'.format(val_bleu_temp))
+sess.run(iterator.initializer, feed_dict={paras_ph: val_paras,
+                                          titles_ph: val_titles,
+                                          batch_size: 1})
+outputs_to_write = []
+while True:
+  try:
+    outputs_to_write.extend(sess.run(outputs.sample_id, feed_dict={batch_size: 1}))
+  except tf.errors.OutOfRangeError:
+    break
+
+vocab, embedding = loadGlove(embedding_file)
+reverse_vocab = rev_vocab(vocab)
+output_file = open('./workspace/title_out.txt', 'w+')
+
+for line in outputs_to_write:
+  a = np.vectorize(reverse_vocab.get)(line)
+  a = ' '.join(a[:-1]) + '\n'
+  output_file.write(a)
+
+output_file.close()
+
 
 
 
