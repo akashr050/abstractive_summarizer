@@ -8,7 +8,6 @@ import bleu
 from sklearn.model_selection import train_test_split
 
 
-
 flags = tf.app.flags
 slim = tf.contrib.slim
 
@@ -22,13 +21,16 @@ flags.DEFINE_integer('embed_dim', 100, '')
 flags.DEFINE_integer('learning_rate', 0.001, '')
 flags.DEFINE_float('clip_gradient_norm', 4, '')
 flags.DEFINE_integer('epochs', 10000, '')
+flags.DEFINE_string('embedding_file', 'glove.6B.100d.txt', '')
+flags.DEFINE_string('titles_file', 'AbsSumm_title_10k.pickle', '')
+flags.DEFINE_integer('paras_file', 'AbsSumm_text_10k.pickle', '')
 
 FLAGS = flags.FLAGS
 data_root_dir = './workspace'
-paras_file = 'harvard.nlp_texts.pickle'
-titles_file = 'harvard.nlp_titles.pickle'
+paras_file = FLAGS.paras_file
+titles_file = FLAGS.titles_file
 # embedding_file = 'glove.6B.100d.txt'
-embedding_file = 'glove_temp.txt'
+embedding_file = FLAGS.embedding_file
 ckpt_dir = './checkpoints'
 
 workspace_path = lambda file_path: os.path.join(data_root_dir, file_path)
