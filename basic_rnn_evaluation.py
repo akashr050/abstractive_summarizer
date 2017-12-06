@@ -15,12 +15,12 @@ EOS_CHAR, EOS_INDEX = '<EOS>', 0
 UNK_CHAR, UNK_INDEX = '<UNK>', 1
 SOS_CHAR, SOS_INDEX = '<SOS>', 2
 flags.DEFINE_integer('batch_size', 10, '')
-flags.DEFINE_integer('hidden_dim', 256, '')
+flags.DEFINE_integer('hidden_dim', 512, '')
 flags.DEFINE_integer('num_units', 3, '')
 flags.DEFINE_integer('embed_dim', 100, '')
 flags.DEFINE_integer('learning_rate', 0.001, '')
 flags.DEFINE_float('clip_gradient_norm', 4, '')
-flags.DEFINE_integer('epochs', 10000, '')
+flags.DEFINE_integer('epochs', 100, '')
 flags.DEFINE_string('embedding_file', 'glove.6B.100d.txt', '')
 flags.DEFINE_string('titles_file', 'AbsSumm_title_10k.pickle', '')
 flags.DEFINE_string('paras_file', 'AbsSumm_text_10k.pickle', '')
@@ -106,7 +106,7 @@ def _input_parse_function(para, title):
 paras_ph = tf.placeholder(tf.string, shape=(None,))
 titles_ph = tf.placeholder(tf.string, shape=(None,))
 # is_training = tf.placeholder(tf.bool, shape=())
-is_training = False
+is_training = True
 batch_size = tf.placeholder(tf.int32, shape=())
 # paras_ph = input_paras
 # titles_ph = input_titles
@@ -158,7 +158,7 @@ decoder = tf.contrib.seq2seq.BasicDecoder(cell=decoder_output_cell, helper=helpe
 outputs, final_state, final_sequence_lengths = tf.contrib.seq2seq.dynamic_decode(decoder=decoder,
                                                                                  output_time_major=False,
                                                                                  impute_finished=True,
-                                                                                 maximum_iterations=40)
+                                                                                 maximum_iterations=100)
 # TODO: Add variable for maximum iterations
 blue_score = bleu.bleu_score(predictions=outputs.sample_id, labels=title_batch[:, 1:])
 
@@ -171,15 +171,18 @@ tf.tables_initializer().run(session=sess)
 sess.run(tf.global_variables_initializer())
 sess.run(embedding_init, feed_dict={embedding_placeholder: embedding})
 saver = tf.train.import_meta_graph('checkpoints.meta')
-saver.restore(sess, tf.train.latest_checkpoint('./'))
+saver.restore(sess, tf.train.latest_checkpoint('.'))
 
 sess.run(iterator.initializer, feed_dict={paras_ph: val_paras,
                                           titles_ph: val_titles,
                                           batch_size: 1})
 outputs_to_write = []
+i = 0
 while True:
   try:
     outputs_to_write.extend(sess.run(outputs.sample_id, feed_dict={batch_size: 1}))
+    print("Step: {}".format(i))
+    i = i+1
   except tf.errors.OutOfRangeError:
     break
 
@@ -190,6 +193,7 @@ output_file = open('./workspace/title_out.txt', 'w+')
 for line in outputs_to_write:
   a = np.vectorize(reverse_vocab.get)(line)
   a = ' '.join(a[:-1]) + '\n'
+
   output_file.write(a)
 
 output_file.close()
