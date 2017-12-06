@@ -19,7 +19,7 @@ flags.DEFINE_integer('num_units', 3, '')
 flags.DEFINE_integer('embed_dim', 100, '')
 flags.DEFINE_integer('learning_rate', 0.001, '')
 flags.DEFINE_float('clip_gradient_norm', 4, '')
-flags.DEFINE_integer('epochs', 10000, '')
+flags.DEFINE_integer('epochs', 100, '')
 flags.DEFINE_string('embedding_file', 'new_glove.txt', '')
 flags.DEFINE_string('titles_file', 'AbsSumm_title_60k.pkl', '')
 flags.DEFINE_string('paras_file', 'AbsSumm_text_60k.pkl', '')
@@ -93,7 +93,7 @@ for epoch in range(FLAGS.epochs):
     except tf.errors.OutOfRangeError:
       break
   saver.save(sess, ckpt_dir)
-  if epoch % 10 == 0:
+  if epoch % 50 == 0:
     # sess.run(iterator.initializer, feed_dict={paras_ph: input_paras,
     #                                           titles_ph: input_titles,
     #                                           batch_size: 1})
