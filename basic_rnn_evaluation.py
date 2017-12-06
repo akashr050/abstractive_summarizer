@@ -14,16 +14,16 @@ slim = tf.contrib.slim
 EOS_CHAR, EOS_INDEX = '<EOS>', 0
 UNK_CHAR, UNK_INDEX = '<UNK>', 1
 SOS_CHAR, SOS_INDEX = '<SOS>', 2
-flags.DEFINE_integer('batch_size', 10, '')
+flags.DEFINE_integer('batch_size', 100, '')
 flags.DEFINE_integer('hidden_dim', 512, '')
 flags.DEFINE_integer('num_units', 3, '')
 flags.DEFINE_integer('embed_dim', 100, '')
 flags.DEFINE_integer('learning_rate', 0.001, '')
 flags.DEFINE_float('clip_gradient_norm', 4, '')
-flags.DEFINE_integer('epochs', 100, '')
-flags.DEFINE_string('embedding_file', 'glove.6B.100d.txt', '')
-flags.DEFINE_string('titles_file', 'AbsSumm_title_10k.pickle', '')
-flags.DEFINE_string('paras_file', 'AbsSumm_text_10k.pickle', '')
+flags.DEFINE_integer('epochs', 10000, '')
+flags.DEFINE_string('embedding_file', 'new_glove.txt', '')
+flags.DEFINE_string('titles_file', 'AbsSumm_title_60k.pkl', '')
+flags.DEFINE_string('paras_file', 'AbsSumm_text_60k.pkl', '')
 
 FLAGS = flags.FLAGS
 data_root_dir = './workspace'
@@ -42,13 +42,13 @@ try:
 except:
   pass
 
-if paras_file.endswith('.pickle'):
+if paras_file.endswith('.pickle') or paras_file.endswith('pkl'):
   input_paras = pickle.load(open(paras_file,'rb'))
   input_titles = pickle.load(open(titles_file, 'rb'))
 
 print("Data is loaded. It has {} rows".format(len(input_paras)))
 input_paras, val_paras, input_titles, val_titles = train_test_split(input_paras, input_titles,
-                                                                    test_size=1000, train_size=9000, shuffle=False)
+                                                                    test_size=100, train_size=60000, shuffle=False)
 
 
 ###################
@@ -66,11 +66,11 @@ def loadGlove(embedding_file):
   file.close()
   return vocab, np.asarray(embedding)
 
-def get_bleu(sess, batch_size):
+def get_bleu(sess, batch_size, bleu_score):
   bleu_score_temp = []
   while True:
     try:
-      bleu_score_temp.append(sess.run(blue_score, feed_dict={batch_size: 1}))
+      bleu_score_temp.append(sess.run(bleu_score, feed_dict={batch_size: 1}))
     except tf.errors.OutOfRangeError:
       break
   return sum(bleu_score_temp) / len(bleu_score_temp)
@@ -106,7 +106,7 @@ def _input_parse_function(para, title):
 paras_ph = tf.placeholder(tf.string, shape=(None,))
 titles_ph = tf.placeholder(tf.string, shape=(None,))
 # is_training = tf.placeholder(tf.bool, shape=())
-is_training = True
+is_training = False
 batch_size = tf.placeholder(tf.int32, shape=())
 # paras_ph = input_paras
 # titles_ph = input_titles
