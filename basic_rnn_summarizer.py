@@ -14,16 +14,16 @@ slim = tf.contrib.slim
 EOS_CHAR, EOS_INDEX = '<EOS>', 0
 UNK_CHAR, UNK_INDEX = '<UNK>', 1
 SOS_CHAR, SOS_INDEX = '<SOS>', 2
-flags.DEFINE_integer('batch_size', 10, '')
+flags.DEFINE_integer('batch_size', 100, '')
 flags.DEFINE_integer('hidden_dim', 512, '')
 flags.DEFINE_integer('num_units', 3, '')
 flags.DEFINE_integer('embed_dim', 100, '')
 flags.DEFINE_integer('learning_rate', 0.001, '')
 flags.DEFINE_float('clip_gradient_norm', 4, '')
 flags.DEFINE_integer('epochs', 10000, '')
-flags.DEFINE_string('embedding_file', 'glove.6B.100d.txt', '')
-flags.DEFINE_string('titles_file', 'AbsSumm_title_10k.pickle', '')
-flags.DEFINE_string('paras_file', 'AbsSumm_text_10k.pickle', '')
+flags.DEFINE_string('embedding_file', 'new_glove.txt', '')
+flags.DEFINE_string('titles_file', 'AbsSumm_title_60k.pkl', '')
+flags.DEFINE_string('paras_file', 'AbsSumm_text_60k.pkl', '')
 
 FLAGS = flags.FLAGS
 data_root_dir = './workspace'
@@ -42,14 +42,13 @@ try:
 except:
   pass
 
-if paras_file.endswith('.pickle'):
+if paras_file.endswith('.pickle') or paras_file.endswith('pkl'):
   input_paras = pickle.load(open(paras_file,'rb'))
   input_titles = pickle.load(open(titles_file, 'rb'))
 
 print("Data is loaded. It has {} rows".format(len(input_paras)))
 input_paras, val_paras, input_titles, val_titles = train_test_split(input_paras, input_titles,
-                                                                    test_size=1000, train_size=9000, shuffle=False)
-
+                                                                    test_size=5000, train_size=60000, shuffle=False)
 
 ###################
 ## Getting VOCAB ##
@@ -57,13 +56,14 @@ input_paras, val_paras, input_titles, val_titles = train_test_split(input_paras,
 def loadGlove(embedding_file):
   vocab = [EOS_CHAR, UNK_CHAR, SOS_CHAR]
   embedding = [np.zeros((FLAGS.embed_dim,)), np.random.normal(size=(FLAGS.embed_dim,)), np.ones((FLAGS.embed_dim,))]
-  file = open(embedding_file, 'r+')
-  for index, line in enumerate(file.readlines()):
-    row = line.strip().split(' ')
-    vocab.append(row[0])
-    embedding.append([float(x) for x in row[1:]])
-  print('Glove word vectors are Loaded!')
-  file.close()
+  if embedding_file.endswith('txt'):
+    file = open(embedding_file, 'r+')
+    for index, line in enumerate(file.readlines()):
+      row = line.strip().split(' ')
+      vocab.append(row[0])
+      embedding.append([float(x) for x in row[1:]])
+    print('Glove word vectors are Loaded!')
+    file.close()
   return vocab, np.asarray(embedding)
 
 def get_bleu(sess, batch_size):
@@ -155,7 +155,7 @@ decoder = tf.contrib.seq2seq.BasicDecoder(cell=decoder_output_cell, helper=helpe
 outputs, final_state, final_sequence_lengths = tf.contrib.seq2seq.dynamic_decode(decoder=decoder,
                                                                                  output_time_major=False,
                                                                                  impute_finished=True,
-                                                                                 maximum_iterations=40)
+                                                                                 maximum_iterations=60)
 # TODO: Add variable for maximum iterations
 blue_score = bleu.bleu_score(predictions=outputs.sample_id, labels=title_batch[:, 1:])
 
@@ -193,18 +193,19 @@ for epoch in range(FLAGS.epochs):
     try:
       _, tb_summary = sess.run([optimizer, loss_summary], feed_dict={batch_size: FLAGS.batch_size})
       train_writer.add_summary(tb_summary, global_step=global_step.eval(session=sess))
+      print("Global Step: {}".format(sess.run(global_step)))
     except tf.errors.OutOfRangeError:
       break
   if epoch % 10 == 0:
     saver.save(sess, ckpt_dir)
-    sess.run(iterator.initializer, feed_dict={paras_ph: input_paras,
-                                              titles_ph: input_titles,
-                                              batch_size: 1})
-    train_bleu_temp = get_bleu(sess, batch_size)
-    sess.run(train_bleu.assign(train_bleu_temp))
-    train_bleu_summ = sess.run(train_bleu_summary)
-    train_writer.add_summary(train_bleu_summ, global_step=epoch)
-    print('Training bleu {}'.format(train_bleu_temp))
+    # sess.run(iterator.initializer, feed_dict={paras_ph: input_paras,
+    #                                           titles_ph: input_titles,
+    #                                           batch_size: 1})
+    # train_bleu_temp = get_bleu(sess, batch_size)
+    # sess.run(train_bleu.assign(train_bleu_temp))
+    # train_bleu_summ = sess.run(train_bleu_summary)
+    # train_writer.add_summary(train_bleu_summ, global_step=epoch)
+    # print('Training bleu {}'.format(train_bleu_temp))
     sess.run(iterator.initializer, feed_dict={paras_ph: val_paras,
                                               titles_ph: val_titles,
                                               batch_size: 1})
