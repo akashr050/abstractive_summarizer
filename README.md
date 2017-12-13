@@ -28,6 +28,7 @@ Note: For preprocessing we used the code in preprocessing_code zipped folder.
 
 ## Datasets
 To train the summarizer, we used the signal media dataset. This dataset can be found at http://research.signalmedia.co/newsir16/signal-dataset.html
+
 To test the summarizer, we used the SQUAD dataset. This dataset can be found at https://rajpurkar.github.io/SQuAD-explorer/
 
 ## Authors
