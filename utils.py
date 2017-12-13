@@ -45,3 +45,13 @@ def rev_vocab(vocab):
   for index, val in enumerate(vocab):
     rev_vocab[index] = val
   return rev_vocab
+
+def generate_output(output, output_file, embedding_file):
+  vocab, embedding = loadGlove(embedding_file)
+  reverse_vocab = rev_vocab(vocab)
+  output_file = open(output_file, 'w+')
+  for line in output:
+    temp_summary = np.vectorize(reverse_vocab.get)(line)
+    a = ' '.join(temp_summary[:-1]) + '\n'
+    output_file.write(a)
+  output_file.close()
