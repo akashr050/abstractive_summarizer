@@ -8,15 +8,15 @@ In order to run the code for training and evaluation following are the required 
 2) Create a directory named 'workspace' in the cloned repository
 3) Download the pickle files for training from https://umich.box.com/shared/static/w96f785uzl5x3vrut8nyyptcupjvuiou.pkl , https://umich.box.com/shared/static/32khbsbdhnib2xmuupty85yllsgcsdxv.pkl , https://umich.box.com/shared/static/qxzq3ozlzo0gr9ywvjip8yg87xopbizj.pkl and save in the workspace directory
 4) Create a virtual python environment and install the following packages: scikit-learn, tensorflow-1.4, scipy
-5) Activate the virtual environment and run python3 basic_rnn_summarizer.py to train the model.
+5) Activate the virtual environment and run python3 basic_rnn_summarizer.py to train the model. You can also use the variables declared using flags to modify the batch_size, num_epochs, etc. 
 ```
 python3 basic_rnn_summarizer.py
+python3 basic_rnn_summarizer.py --batch_size=100 
 ```
 6) In order to evaluate the model, run python3 basic_rnn_evaluation.py
 ```
 python3 basic_rnn_evaluation.py
 ```
-You can also use the variables declared using flags to modify the batch_size, num_epochs, etc. 
 7) This evaluation script will save the model outputs as title_out.txt file in your workspace directory. 
 8) Run the json converter file as
 ```
