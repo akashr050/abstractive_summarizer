@@ -16,10 +16,11 @@ python3 basic_rnn_summarizer.py
 ```
 python3 basic_rnn_evaluation.py
 ```
+You can also use the variables declared using flags to modify the batch_size, num_epochs, etc. 
 7) This evaluation script will save the model outputs as title_out.txt file in your workspace directory. 
 8) Run the json converter file as
 ```
-python3 json_to_txt.py workspace/title_out.txt
+python3 json_to_txt.py query.json workspace/title_out.txt
 ```
 9) In order to run the Q/A evaluation script have a look at https://github.com/allenai/bi-att-flow
 
