@@ -3,6 +3,12 @@ Text summarization is a process to create a representative summary or abstract o
 
 ## Getting Started
 
+In order to run the code for training and evaluation following are the required steps:
+1) Clone this github repository on your local machine
+2) Create a directory named 'workspace' in the cloned repository
+3) Download the pickle files for training from <url> and save in the workspace directory
+4) Create a virtual python environment and install the following packages: scikit-learn, tensorflow-1.4, scipy
+5) 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
 ### Prerequisites
