@@ -6,9 +6,18 @@ Text summarization is a process to create a representative summary or abstract o
 In order to run the code for training and evaluation following are the required steps:
 1) Clone this github repository on your local machine
 2) Create a directory named 'workspace' in the cloned repository
-3) Download the pickle files for training from <url> and save in the workspace directory
+3) Download the pickle files for training from https://umich.box.com/shared/static/w96f785uzl5x3vrut8nyyptcupjvuiou.pkl , https://umich.box.com/shared/static/32khbsbdhnib2xmuupty85yllsgcsdxv.pkl , https://umich.box.com/shared/static/qxzq3ozlzo0gr9ywvjip8yg87xopbizj.pkl and save in the workspace directory
 4) Create a virtual python environment and install the following packages: scikit-learn, tensorflow-1.4, scipy
-5) 
+5) Activate the virtual environment and run python3 basic_rnn_summarizer.py to train the model.
+```
+python3 basic_rnn_summarizer.py
+```
+6) In order to evaluate the model, run python3 basic_rnn_evaluation.py
+```
+python3 basic_rnn_evaluation.py
+```
+7) This evaluation script will save the model outputs as txt file in your workspace directory. 
+8) 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
 ### Prerequisites
