@@ -24,7 +24,7 @@ python3 json_to_txt.py query.json workspace/title_out.txt
 ```
 9) In order to run the Q/A evaluation script have a look at https://github.com/allenai/bi-att-flow
 
-Note: For preprocessing we used the code in preprocessing_code folder. 
+Note: For preprocessing we used the code in preprocessing_code zipped folder. 
 
 ## Datasets
 To train the summarizer, we used the signal media dataset. This dataset can be found at http://research.signalmedia.co/newsir16/signal-dataset.html
