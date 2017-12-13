@@ -23,7 +23,6 @@ python3 json_to_txt.py workspace/title_out.txt
 ```
 9) In order to run the Q/A evaluation script have a look at https://github.com/allenai/bi-att-flow
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
 ## Authors
 Akash Rastogi, Bhavika Jalli Reddy, Vidya Mansur, Daniel D'souza
