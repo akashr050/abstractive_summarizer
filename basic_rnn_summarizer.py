@@ -1,3 +1,8 @@
+'''
+  This script is used for training the RNN summarizer
+'''
+
+
 import tensorflow as tf
 import os
 import utils
@@ -32,7 +37,6 @@ FLAGS = flags.FLAGS
 data_root_dir = './workspace'
 paras_file = FLAGS.paras_file
 titles_file = FLAGS.titles_file
-# embedding_file = 'glove.6B.100d.txt'
 embedding_file = FLAGS.embedding_file
 ckpt_dir = './checkpoints'
 utils.force_mkdir(ckpt_dir)
@@ -111,23 +115,3 @@ for epoch in range(FLAGS.epochs):
     val_bleu_summ = sess.run(val_bleu_summary)
     train_writer.add_summary(val_bleu_summ, global_step=epoch)
     print('Validation bleu {}'.format(val_bleu_temp))
-
-
-
-
-# slim.learning.train(train_op=train_op,
-#                     logdir=FLAGS.ckpt_dir,
-#                     number_of_steps=FLAGS.max_number_of_steps,
-#                     saver=saver,
-#                     save_summaries_secs=FLAGS.save_summaries_secs,
-#                     save_interval_secs=FLAGS.save_internal_secs)
-# a, b, e, c, d, f = sess.run([para_batch, title_batch, title_batch[:, 1:], outputs.rnn_output, outputs.sample_id,
-#                           blue_score])
-# # a = 1
-#
-#
-# ################
-# ## Evaluation ##
-# ################
-# # TODO[Remove the Blue score
-

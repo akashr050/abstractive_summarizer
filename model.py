@@ -1,3 +1,7 @@
+'''
+This file is used by the basic_rnn_summarizer and basic_rnn_evaluation script to get the RNN model
+'''
+
 import tensorflow as tf
 import utils
 
@@ -7,6 +11,15 @@ SOS_CHAR, SOS_INDEX = utils.symbols['SOS_CHAR'], utils.symbols['SOS_INDEX']
 
 
 def RNNModel(inputs, params, is_training=True, multirnn=True):
+  '''
+  This function creates the RNN model
+  :param inputs: This is the dictionary of input tensors required for RNN model creation
+  :param params: This is the class of parameters
+  :param is_training: Whether we are training the model or not
+  :param multirnn: Whether we are using a multi-rnn cells or not
+  :return:
+    outputs of the decoder
+  '''
   para_embedding = inputs['para_embedding']
   para_length = inputs['para_length']
   title_embedding = inputs['title_embedding']
@@ -55,7 +68,7 @@ def RNNModel(inputs, params, is_training=True, multirnn=True):
 
   decoder = tf.contrib.seq2seq.BasicDecoder(cell=decoder_output_cell, helper=helper, initial_state=encoder_final_state)
   outputs, _, _ = tf.contrib.seq2seq.dynamic_decode(decoder=decoder,
-                                                                                   output_time_major=False,
-                                                                                   impute_finished=True,
-                                                                                   maximum_iterations=60)
+                                                    output_time_major=False,
+                                                    impute_finished=True,
+                                                    maximum_iterations=60)
   return outputs

@@ -1,16 +1,9 @@
-
-# coding: utf-8
-
-# In[6]:
-
+'''
+This file converts the generated summaries to the json files
+'''
 
 import json
-import numpy as np
 import sys
-
-
-# In[60]:
-
 
 with open(sys.argv[1]) as json_data:
     d = json.load(json_data)
@@ -23,8 +16,6 @@ with open(sys.argv[2],"r") as f:
     for line in f:
         x = line.replace('\n','')
         lines.append(x)
-        
-
 
 for line_n in range(len(lines)):
     if i < (max_i):
@@ -35,22 +26,5 @@ for line_n in range(len(lines)):
         if j >= max_j:
             i+= 1
 
-
-
-# In[61]:
-
-
 with open('data_mod.json', 'w',encoding='utf8') as outfile:  
     json.dump(d, outfile)
-
-
-# In[57]:
-
-
-#print(d['data'][0]['title'])
-#print(len(d['data'][0]['paragraphs']))
-#print(len(d['data']))
-#for j in range(48):
-#    for i in range(54):
-#        print(d['data'][0]['paragraphs'][i]['context'])
-

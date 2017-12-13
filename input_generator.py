@@ -1,3 +1,7 @@
+'''
+This file is used by the basic_rnn_summarizer and basic_rnn_evaluation script to generate the input data
+'''
+
 import pickle
 import utils
 import tensorflow as tf
@@ -9,7 +13,30 @@ UNK_CHAR, UNK_INDEX = utils.symbols['UNK_CHAR'], utils.symbols['UNK_INDEX']
 SOS_CHAR, SOS_INDEX = utils.symbols['SOS_CHAR'], utils.symbols['SOS_INDEX']
 
 def get_inputs(paras_file, titles_file, embedding_file, params):
+  '''
+  This function returns a dictionary of input texts, inputs required for tensorflow operation and input
+  placeholder and operations
+  :param paras_file: This the file for the input text
+  :param titles_file: This is the file for the input summaries
+  :param embedding_file: This is the embedding file like Glove, word2vec, etc
+  :param params: These are the flags required for the input text batch iterator
+  :return:
+    inputs: This is the dictionary corresponding to the input training and validation texts and summaries
+    inputs_tf: This is the dictionary with the tensorflow variables which will be used as inputs to the RNN
+               summarizer
+    inputs_ph_op: This is the dictionary with the tensorflow placeholders and operations which we will use to
+                  declare the session
+  '''
   def _input_parse_function(para, title):
+    '''
+    This function is used to parse the input
+    :param para: This is the input paragraph
+    :param title: This is the input summary
+    :return:
+      A tuple for para as well as for title. This tuple consists of following two things:
+       i) A list consisting of all the input words
+       ii) Number of words in the input
+    '''
     def parse_input(text, src=None):
       words = tf.string_split([text]).values
       size = tf.size(words)

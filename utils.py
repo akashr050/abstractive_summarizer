@@ -9,6 +9,9 @@ symbols['SOS_CHAR'], symbols['SOS_INDEX'] = '<SOS>', 2
 
 
 def force_mkdir(dir_path):
+  '''
+  This function is used to create a directory if it doesn't exists
+  '''
   try:
     os.mkdir(dir_path)
   except:
@@ -16,6 +19,11 @@ def force_mkdir(dir_path):
 
 
 def loadGlove(embedding_file, params):
+  '''
+  This function is used to load the embedding
+  :param embedding_file: The path to embedding_file
+  :param params: The parameters for its extraction
+  '''
   EOS_CHAR, SOS_CHAR, UNK_CHAR = symbols['EOS_CHAR'], symbols['SOS_CHAR'], symbols['UNK_CHAR']
   vocab = [EOS_CHAR, UNK_CHAR, SOS_CHAR]
   embedding = [np.zeros((params.embed_dim,)), np.random.normal(size=(params.embed_dim,)), np.ones((params.embed_dim,))]
@@ -31,6 +39,9 @@ def loadGlove(embedding_file, params):
 
 
 def get_bleu(sess, batch_size, bleu_score):
+  '''
+  This function returns the bleu score
+  '''
   bleu_score_temp = []
   while True:
     try:
@@ -41,12 +52,18 @@ def get_bleu(sess, batch_size, bleu_score):
 
 
 def rev_vocab(vocab):
+  '''
+  This function returns the reverse vocab dictionary
+  '''
   rev_vocab = dict()
   for index, val in enumerate(vocab):
     rev_vocab[index] = val
   return rev_vocab
 
 def generate_output(output, output_file, embedding_file):
+  '''
+  This function converts the output from index to text based on embedding_file and save it in output_file
+  '''
   vocab, embedding = loadGlove(embedding_file)
   reverse_vocab = rev_vocab(vocab)
   output_file = open(output_file, 'w+')

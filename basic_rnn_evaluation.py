@@ -1,3 +1,8 @@
+'''
+  This script is used for evaluating the RNN summarizer
+'''
+
+
 import tensorflow as tf
 import os
 import utils
@@ -80,25 +85,3 @@ while True:
     break
 
 utils.generate_output(outputs_to_write, output_file, embedding_file)
-
-
-
-
-
-
-# slim.learning.train(train_op=train_op,
-#                     logdir=FLAGS.ckpt_dir,
-#                     number_of_steps=FLAGS.max_number_of_steps,
-#                     saver=saver,
-#                     save_summaries_secs=FLAGS.save_summaries_secs,
-#                     save_interval_secs=FLAGS.save_internal_secs)
-# a, b, e, c, d, f = sess.run([para_batch, title_batch, title_batch[:, 1:], outputs.rnn_output, outputs.sample_id,
-#                           blue_score])
-# # a = 1
-#
-#
-# ################
-# ## Evaluation ##
-# ################
-# # TODO[Remove the Blue score
-
