@@ -16,7 +16,7 @@ python3 basic_rnn_summarizer.py
 ```
 python3 basic_rnn_evaluation.py
 ```
-7) This evaluation script will save the model outputs as txt file in your workspace directory. 
+7) This evaluation script will save the model outputs as title_out.txt file in your workspace directory. 
 8) 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
